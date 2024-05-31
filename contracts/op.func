@@ -1,0 +1,24 @@
+int op::on_transfer() asm "0x00000000 PUSHINT";
+
+int op::resolve_transfer() asm "0x10000000 PUSHINT";
+int op::resolve_transfer_with_incorrect_callback() asm "0x10000001 PUSHINT";
+
+int op::transfer() asm "0x20000000 PUSHINT";
+int op::transfer_from_zero_address() asm "0x20000001 PUSHINT";
+int op::transfer_to_zero_address() asm "0x20000002 PUSHINT";
+int op::transfer_amount_exceeds_balance() asm "0x20000003 PUSHINT";
+int op::transfer_to_cosmos() asm "0x20000004 PUSHINT";
+int op::received_from_cosmos() asm "0x20000005 PUSHINT";
+
+int op::transfer_call() asm "0x30000000 PUSHINT";
+
+int op::mint() asm "0x40000000 PUSHINT";
+int op::mint_to_zero_address() asm "0x40000001 PUSHINT";
+
+int op::burn() asm "0x50000000 PUSHINT";
+int op::burn_from_zero_address() asm "0x50000001 PUSHINT";
+int op::burn_amount_exceeds_balance() asm "0x50000002 PUSHINT";
+
+int op::accept_payment() asm "0xaaaaaaaa PUSHINT";
+int op::insufficient_payment() asm "0xbbbbbbbb PUSHINT";
+int op::failure() asm "0xffffffff PUSHINT";

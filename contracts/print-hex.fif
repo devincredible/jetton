@@ -1,0 +1,8 @@
+#!/usr/bin/fift -s
+"Asm.fif" include
+
+."ft:" cr
+
+"jetton.fif" include
+2 boc+>B dup Bx. cr
+

@@ -1,0 +1,684 @@
+"Asm.fif" include
+// automatically generated from `op.func` `stdlib.func` `utils.func` `data.func` `fungible_token.func` 
+PROGRAM{
+  DECLPROC address
+  DECLPROC send_message
+  DECLPROC send_payload_message
+  DECLPROC store_data
+  DECLPROC load_data
+  DECLPROC _get_balance
+  DECLPROC _set_balance
+  DECLPROC _del_balance
+  DECLPROC _get_callback
+  DECLPROC _set_callback
+  DECLPROC _del_callback
+  DECLPROC _get_total_supply
+  DECLPROC _set_total_supply
+  DECLPROC _get_owner
+  DECLPROC _set_owner
+  DECLPROC _get_metadata
+  DECLPROC _set_metadata
+  DECLPROC only_owner
+  DECLPROC _transfer
+  DECLPROC _transfer_call
+  DECLPROC _resolve_transfer
+  DECLPROC _mint
+  DECLPROC _burn
+  DECLPROC recv_internal
+  DECLPROC recv_external
+  91827 DECLMETHOD metadata
+  130834 DECLMETHOD total_supply
+  83229 DECLMETHOD owner
+  112966 DECLMETHOD balance_of
+  82759 DECLMETHOD allowance
+  70639 DECLMETHOD callback
+  address PROCREF:<{
+    //  wc addr
+    0 PUSHINT	//  wc addr _2=0
+    2 PUSHINT	//  wc addr _2=0 _3=2
+    NEWC	//  wc addr _2=0 _3=2 _4
+    2 STU	//  wc addr _2=0 _6
+    1 STU	//  wc addr _8
+    s1 s2 XCHG	//  addr wc _8
+    8 STI	//  addr _10
+    256 STU	//  _12
+    ENDC	//  _13
+    CTOS	//  _14
+  }>
+  send_message PROCREF:<{
+    //  to ton_amount op query_id mode
+    0 PUSHINT	//  to ton_amount op query_id mode _5=0
+    24 PUSHINT	//  to ton_amount op query_id mode _5=0 _6=24
+    NEWC	//  to ton_amount op query_id mode _5=0 _6=24 _7
+    6 STU	//  to ton_amount op query_id mode _5=0 _9
+    s0 s6 XCHG2	//  _5=0 ton_amount op query_id mode _9 to
+    STSLICER	//  _5=0 ton_amount op query_id mode _10
+    s0 s4 XCHG2	//  _5=0 mode op query_id _10 ton_amount
+    STGRAMS	//  _5=0 mode op query_id _11
+    s1 s4 XCHG	//  query_id mode op _5=0 _11
+    107 STU	//  query_id mode op _25
+    32 STU	//  query_id mode _27
+    s1 s2 XCHG	//  mode query_id _27
+    64 STU	//  mode _29
+    ENDC	//  mode _30
+    SWAP	//  _30 mode
+    SENDRAWMSG
+  }>
+  send_payload_message PROCREF:<{
+    //  to ton_amount token_amount op query_id payload mode
+    0 PUSHINT	//  to ton_amount token_amount op query_id payload mode _7=0
+    24 PUSHINT	//  to ton_amount token_amount op query_id payload mode _7=0 _8=24
+    NEWC	//  to ton_amount token_amount op query_id payload mode _7=0 _8=24 _9
+    6 STU	//  to ton_amount token_amount op query_id payload mode _7=0 _11
+    s0 s8 XCHG2	//  _7=0 ton_amount token_amount op query_id payload mode _11 to
+    STSLICER	//  _7=0 ton_amount token_amount op query_id payload mode _12
+    s0 s6 XCHG2	//  _7=0 mode token_amount op query_id payload _12 ton_amount
+    STGRAMS	//  _7=0 mode token_amount op query_id payload _13
+    s1 s6 XCHG	//  payload mode token_amount op query_id _7=0 _13
+    107 STU	//  payload mode token_amount op query_id _27
+    s1 s2 XCHG	//  payload mode token_amount query_id op _27
+    32 STU	//  payload mode token_amount query_id _29
+    64 STU	//  payload mode token_amount _31
+    256 STU	//  payload mode _33
+    s1 s2 XCHG	//  mode payload _33
+    STREF	//  mode _34
+    ENDC	//  mode _35
+    SWAP	//  _35 mode
+    SENDRAWMSG
+  }>
+  store_data PROC:<{
+    //  balances callbacks total_supply owner_addr metadata
+    s0 s4 XCHG
+    NEWC	//  metadata callbacks total_supply owner_addr balances _5
+    STDICT	//  metadata callbacks total_supply owner_addr _6
+    s1 s3 XCHG	//  metadata owner_addr total_supply callbacks _6
+    STDICT	//  metadata owner_addr total_supply _7
+    256 STU	//  metadata owner_addr _9
+    256 STU	//  metadata _11
+    STREF	//  _12
+    ENDC	//  _13
+    c4 POP
+  }>
+  load_data PROC:<{
+    //  data
+    CTOS	//  ds
+    LDDICT	//  balances ds
+    LDDICT	//  balances callbacks ds
+    256 LDU	//  balances callbacks total_supply ds
+    256 LDU	//  balances callbacks total_supply owner_addr ds
+    LDREF	//  balances callbacks total_supply owner_addr _29 _28
+    DROP	//  balances callbacks total_supply owner_addr metadata
+  }>
+  _get_balance PROCREF:<{
+    //  account
+    c4 PUSH	//  account _6
+    load_data CALLDICT	//  account _20 _21 _22 _23 _24
+    4 BLKDROP	//  account balances
+    0 PUSHINT	//  account balances res=0
+    s0 s2 XCHG	//  res=0 balances account
+    REWRITESTDADDR	//  res=0 balances _25 _26
+    NIP	//  res=0 balances account_addr
+    SWAP
+    8 PUSHPOW2	//  res=0 account_addr balances _15=256
+    DICTUGET
+    NULLSWAPIFNOT	//  res=0 balance_slice balance_found
+    IF:<{	//  res=0 balance_slice
+      NIP	//  balance_slice
+      256 LDU	//  _30 _29
+      DROP	//  res
+    }>ELSE<{
+      DROP	//  res
+    }>
+  }>
+  _set_balance PROCREF:<{
+    //  account amount
+    c4 PUSH	//  account amount _7
+    load_data CALLDICT	//  account amount balances callbacks total_supply owner_addr metadata
+    s0 s6 XCHG	//  metadata amount balances callbacks total_supply owner_addr account
+    REWRITESTDADDR	//  metadata amount balances callbacks total_supply owner_addr _24 _25
+    NIP	//  metadata amount balances callbacks total_supply owner_addr account_addr
+    s0 s5 XCHG
+    NEWC	//  metadata account_addr balances callbacks total_supply owner_addr amount _13
+    256 STU	//  metadata account_addr balances callbacks total_supply owner_addr _15
+    s0 s5 s4 XCHG3
+    8 PUSHPOW2	//  metadata owner_addr total_supply callbacks _15 account_addr balances _16=256
+    DICTUSETB	//  metadata owner_addr total_supply callbacks balances
+    s3 s4 XCHG2	//  balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  _del_balance PROCREF:<{
+    //  account
+    c4 PUSH	//  account _6
+    load_data CALLDICT	//  account balances callbacks total_supply owner_addr metadata
+    s0 s5 XCHG	//  metadata balances callbacks total_supply owner_addr account
+    REWRITESTDADDR	//  metadata balances callbacks total_supply owner_addr _20 _21
+    NIP	//  metadata balances callbacks total_supply owner_addr account_addr
+    s0 s4 XCHG2
+    8 PUSHPOW2	//  metadata owner_addr callbacks total_supply account_addr balances _12=256
+    DICTUDEL	//  metadata owner_addr callbacks total_supply _22 _23
+    DROP	//  metadata owner_addr callbacks total_supply balances
+    s1 s3 s4 XCHG3	//  balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  _get_callback PROCREF:<{
+    //  id
+    c4 PUSH	//  id _6
+    load_data CALLDICT	//  id _29 _30 _31 _32 _33
+    s3 s4 XCHG
+    4 BLKDROP	//  id callbacks
+    -1 PUSHINT	//  id callbacks _9=-1
+    0 PUSHINT	//  id callbacks _9=-1 _10=0
+    address INLINECALLDICT	//  id callbacks sender
+    -1 PUSHINT	//  id callbacks sender _13=-1
+    0 PUSHINT	//  id callbacks sender _13=-1 _14=0
+    address INLINECALLDICT	//  id callbacks sender receiver
+    0 PUSHINT	//  id callbacks sender receiver amount=0
+    s4 s3 XCHG2
+    64 PUSHINT	//  receiver amount=0 sender id callbacks _20=64
+    DICTUGET
+    NULLSWAPIFNOT	//  receiver amount=0 sender callback_slice callback_found
+    IF:<{	//  receiver amount=0 sender callback_slice
+      3 1 BLKDROP2	//  callback_slice
+      LDMSGADDR	//  sender callback_slice
+      LDMSGADDR	//  sender receiver callback_slice
+      256 LDU	//  sender receiver _41 _40
+      DROP	//  sender receiver amount
+      ROT	//  receiver amount sender
+    }>ELSE<{
+      DROP	//  receiver amount sender
+    }>
+    -ROT	//  sender receiver amount
+  }>
+  _set_callback PROCREF:<{
+    //  sender receiver amount
+    c4 PUSH	//  sender receiver amount _8
+    load_data CALLDICT	//  sender receiver amount balances callbacks total_supply owner_addr metadata
+    0 PUSHINT	//  sender receiver amount balances callbacks total_supply owner_addr metadata id=0
+    s4 PUSH
+    64 PUSHINT	//  sender receiver amount balances callbacks total_supply owner_addr metadata id=0 callbacks _15=64
+    DICTUMAX
+    NULLSWAPIFNOT2	//  sender receiver amount balances callbacks total_supply owner_addr metadata id=0 _34 _33 _35
+    1 2 BLKDROP2	//  sender receiver amount balances callbacks total_supply owner_addr metadata id=0 last_id found
+    IF:<{	//  sender receiver amount balances callbacks total_supply owner_addr metadata id=0 last_id
+      NIP	//  sender receiver amount balances callbacks total_supply owner_addr metadata last_id
+      INC	//  sender receiver amount balances callbacks total_supply owner_addr metadata id
+    }>ELSE<{
+      DROP	//  sender receiver amount balances callbacks total_supply owner_addr metadata id
+    }>
+    NEWC	//  sender receiver amount balances callbacks total_supply owner_addr metadata id _20
+    s0 s9 XCHG2	//  id receiver amount balances callbacks total_supply owner_addr metadata _20 sender
+    STSLICER	//  id receiver amount balances callbacks total_supply owner_addr metadata _21
+    s0 s7 XCHG2	//  id metadata amount balances callbacks total_supply owner_addr _21 receiver
+    STSLICER	//  id metadata amount balances callbacks total_supply owner_addr _22
+    s1 s5 XCHG	//  id metadata owner_addr balances callbacks total_supply amount _22
+    256 STU	//  id metadata owner_addr balances callbacks total_supply _24
+    s0 s6 s2 XCPUXC
+    64 PUSHINT	//  id metadata owner_addr balances total_supply _24 id callbacks _25=64
+    DICTUSETB	//  id metadata owner_addr balances total_supply callbacks
+    s4 s3 s3 XCHG3
+    s0 s2 XCHG	//  id balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  _del_callback PROCREF:<{
+    //  id
+    c4 PUSH	//  id _6
+    load_data CALLDICT	//  id balances callbacks total_supply owner_addr metadata
+    s5 s3 XCHG2
+    64 PUSHINT	//  owner_addr balances metadata total_supply id callbacks _9=64
+    DICTUDEL	//  owner_addr balances metadata total_supply _17 _18
+    DROP	//  owner_addr balances metadata total_supply callbacks
+    s0 s3 XCHG
+    s1 s4 s4 XCHG3	//  balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  _get_total_supply PROCREF:<{
+    // 
+    c4 PUSH	//  _5
+    load_data CALLDICT	//  _7 _8 _9 _10 _11
+    s2 s4 XCHG
+    4 BLKDROP	//  total_supply
+  }>
+  _set_total_supply PROCREF:<{
+    //  amount
+    c4 PUSH	//  amount _6
+    load_data CALLDICT	//  amount _9 _10 _11 _12 _13
+    s2 POP	//  total_supply balances callbacks metadata owner_addr
+    s3 s4 XCHG
+    s3 s0 s0 XCHG3	//  balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  _get_owner PROCREF:<{
+    // 
+    c4 PUSH	//  _5
+    load_data CALLDICT	//  _7 _8 _9 _10 _11
+    s1 s4 XCHG
+    4 BLKDROP	//  owner_addr
+  }>
+  _set_owner PROCREF:<{
+    //  addr
+    c4 PUSH	//  addr _6
+    load_data CALLDICT	//  addr _9 _10 _11 _12 _13
+    NIP	//  owner_addr balances callbacks total_supply metadata
+    s3 s4 XCHG
+    s1 s3 s0 XCHG3	//  balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  _get_metadata PROCREF:<{
+    // 
+    c4 PUSH	//  _5
+    load_data CALLDICT	//  _25 _26 _27 _28 _29
+    4 1 BLKDROP2	//  metadata
+    CTOS	//  metadata_slice
+    LDREF	//  name metadata_slice
+    LDREF	//  name symbol metadata_slice
+    8 LDU	//  name symbol decimals metadata_slice
+    LDREF	//  name symbol decimals icon metadata_slice
+    LDREF	//  name symbol decimals icon _39 _38
+    DROP	//  name symbol decimals icon spec
+  }>
+  _set_metadata PROCREF:<{
+    //  name symbol decimals icon spec
+    c4 PUSH	//  name symbol decimals icon spec _10
+    load_data CALLDICT	//  name symbol decimals icon spec _22 _23 _24 _25 _26
+    DROP	//  name symbol decimals icon spec balances callbacks total_supply owner_addr
+    s0 s8 XCHG
+    NEWC	//  owner_addr symbol decimals icon spec balances callbacks total_supply name _13
+    STREF	//  owner_addr symbol decimals icon spec balances callbacks total_supply _14
+    s1 s7 XCHG	//  owner_addr total_supply decimals icon spec balances callbacks symbol _14
+    STREF	//  owner_addr total_supply decimals icon spec balances callbacks _15
+    s1 s5 XCHG	//  owner_addr total_supply callbacks icon spec balances decimals _15
+    8 STU	//  owner_addr total_supply callbacks icon spec balances _17
+    s1 s3 XCHG	//  owner_addr total_supply callbacks balances spec icon _17
+    STREF	//  owner_addr total_supply callbacks balances spec _18
+    STREF	//  owner_addr total_supply callbacks balances _19
+    ENDC	//  owner_addr total_supply callbacks balances metadata
+    4 1 REVERSE	//  balances callbacks total_supply owner_addr metadata
+    store_data CALLDICT
+  }>
+  only_owner PROCREF:<{
+    //  msg_sender
+    c4 PUSH	//  msg_sender _6
+    load_data CALLDICT	//  msg_sender _14 _15 _16 _17 _18
+    s1 s4 XCHG
+    4 BLKDROP	//  msg_sender owner_addr
+    SWAP	//  owner_addr msg_sender
+    REWRITESTDADDR	//  owner_addr _19 _20
+    NIP	//  owner_addr msg_sender_addr
+    SWAP	//  msg_sender_addr owner_addr
+    EQUAL	//  _11
+    IFJMP:<{	// 
+      -1 PUSHINT	//  _12=-1
+    }>	// 
+    0 PUSHINT	//  _13=0
+  }>
+  _transfer PROC:<{
+    //  sender receiver amount
+    s2 PUSH	//  sender receiver amount sender
+    REWRITESTDADDR	//  sender receiver amount _34 _35
+    NIP	//  sender receiver amount sender_addr
+    0 EQINT	//  sender receiver amount _7
+    IFJMP:<{	//  sender receiver amount
+      3 BLKDROP	// 
+      0x20000001 PUSHINT	//  _8
+    }>	//  sender receiver amount
+    OVER	//  sender receiver amount receiver
+    REWRITESTDADDR	//  sender receiver amount _36 _37
+    NIP	//  sender receiver amount receiver_addr
+    0 EQINT	//  sender receiver amount _13
+    IFJMP:<{	//  sender receiver amount
+      3 BLKDROP	// 
+      0x20000002 PUSHINT	//  _14
+    }>	//  sender receiver amount
+    s2 PUSH	//  sender receiver amount sender
+    _get_balance INLINECALLDICT	//  sender receiver amount sender_balance
+    s2 PUSH	//  sender receiver amount sender_balance receiver
+    _get_balance INLINECALLDICT	//  sender receiver amount sender_balance receiver_balance
+    s1 s2 PUSH2	//  sender receiver amount sender_balance receiver_balance sender_balance amount
+    LESS	//  sender receiver amount sender_balance receiver_balance _19
+    IFJMP:<{	//  sender receiver amount sender_balance receiver_balance
+      5 BLKDROP	// 
+      0x20000003 PUSHINT	//  _20
+    }>	//  sender receiver amount sender_balance receiver_balance
+    s1 s2 XCPU	//  sender receiver amount receiver_balance sender_balance amount
+    SUB	//  sender receiver amount receiver_balance new_sender_balance
+    s0 s2 XCHG	//  sender receiver new_sender_balance receiver_balance amount
+    ADD	//  sender receiver new_sender_balance new_receiver_balance
+    OVER	//  sender receiver new_sender_balance new_receiver_balance new_sender_balance
+    0 EQINT	//  sender receiver new_sender_balance new_receiver_balance _26
+    IF:<{	//  sender receiver new_sender_balance new_receiver_balance
+      NIP	//  sender receiver new_receiver_balance
+      s0 s2 XCHG	//  new_receiver_balance receiver sender
+      _del_balance INLINECALLDICT
+    }>ELSE<{	//  sender receiver new_sender_balance new_receiver_balance
+      s3 s3 XCHG2	//  new_receiver_balance receiver sender new_sender_balance
+      _set_balance INLINECALLDICT
+    }>
+    OVER	//  new_receiver_balance receiver new_receiver_balance
+    0 EQINT	//  new_receiver_balance receiver _30
+    IF:<{	//  new_receiver_balance receiver
+      NIP	//  receiver
+      _del_balance INLINECALLDICT
+    }>ELSE<{	//  new_receiver_balance receiver
+      SWAP	//  receiver new_receiver_balance
+      _set_balance INLINECALLDICT
+    }>
+    0x20000000 PUSHINT	//  _33
+  }>
+  _transfer_call PROC:<{
+    //  sender receiver amount payload
+    s3 s2 s1 PUSH3	//  sender receiver amount payload sender receiver amount
+    _transfer CALLDICT	//  sender receiver amount payload status_code
+    0x20000000 PUSHINT	//  sender receiver amount payload status_code _6
+    s1 s(-1) PUXC	//  sender receiver amount payload status_code status_code _6
+    EQUAL	//  sender receiver amount payload status_code _7
+    IF:<{	//  sender receiver amount payload status_code
+      DROP	//  sender receiver amount payload
+      s3 s2 s1 XCPU2	//  payload receiver amount sender receiver amount
+      _set_callback INLINECALLDICT	//  payload receiver amount callback_id
+      0 PUSHINT	//  payload receiver amount callback_id _10=0
+      0x00000000 PUSHINT	//  payload receiver amount callback_id _10=0 _11
+      s0 s0 s4 XCHG3
+      s0 s5 XCHG
+      64 PUSHINT	//  receiver _10=0 amount _11 callback_id payload _12=64
+      send_payload_message INLINECALLDICT
+      0x30000000 PUSHINT	//  status_code
+    }>ELSE<{
+      4 1 BLKDROP2	//  status_code
+    }>
+  }>
+  _resolve_transfer PROC:<{
+    //  msg_sender callback_id unused_amount
+    OVER	//  msg_sender callback_id unused_amount callback_id
+    _get_callback INLINECALLDICT	//  msg_sender callback_id unused_amount _23 _24 _25
+    DROP	//  msg_sender callback_id unused_amount sender receiver
+    s0 s4 XCHG	//  receiver callback_id unused_amount sender msg_sender
+    REWRITESTDADDR	//  receiver callback_id unused_amount sender _26 _27
+    NIP	//  receiver callback_id unused_amount sender msg_sender_addr
+    s4 PUSH	//  receiver callback_id unused_amount sender msg_sender_addr receiver
+    REWRITESTDADDR	//  receiver callback_id unused_amount sender msg_sender_addr _28 _29
+    NIP	//  receiver callback_id unused_amount sender msg_sender_addr receiver_addr
+    NEQ	//  receiver callback_id unused_amount sender _13
+    IFJMP:<{	//  receiver callback_id unused_amount sender
+      4 BLKDROP	// 
+      0x10000001 PUSHINT	//  _14
+    }>	//  receiver callback_id unused_amount sender
+    OVER	//  receiver callback_id unused_amount sender unused_amount
+    0 GTINT	//  receiver callback_id unused_amount sender _16
+    IF:<{	//  receiver callback_id unused_amount sender
+      s3 PUSH	//  receiver callback_id unused_amount sender receiver
+      _get_balance INLINECALLDICT	//  receiver callback_id unused_amount sender receiver_balance
+      s2 s0 PUSH2	//  receiver callback_id unused_amount sender receiver_balance unused_amount receiver_balance
+      GREATER	//  receiver callback_id unused_amount sender receiver_balance _19
+      IF:<{	//  receiver callback_id unused_amount sender receiver_balance
+        s2 POP	//  receiver callback_id unused_amount sender
+      }>ELSE<{
+        DROP	//  receiver callback_id unused_amount sender
+      }>
+      s3 s0 s0 XCHG3	//  callback_id receiver sender unused_amount
+      _transfer CALLDICT	//  callback_id _20
+      DROP	//  callback_id
+    }>ELSE<{
+      s2 s3 XCHG
+      3 BLKDROP	//  callback_id
+    }>
+    _del_callback INLINECALLDICT
+    0x10000000 PUSHINT	//  _22
+  }>
+  _mint PROC:<{
+    //  account amount
+    OVER	//  account amount account
+    REWRITESTDADDR	//  account amount _17 _18
+    NIP	//  account amount account_addr
+    0 EQINT	//  account amount _6
+    IFJMP:<{	//  account amount
+      2DROP	// 
+      0x40000001 PUSHINT	//  _7
+    }>	//  account amount
+    _get_total_supply INLINECALLDICT	//  account amount total_supply
+    OVER	//  account amount total_supply amount
+    ADD	//  account amount _10
+    _set_total_supply INLINECALLDICT
+    OVER	//  account amount account
+    _get_balance INLINECALLDICT	//  account amount account_balance
+    SWAP	//  account account_balance amount
+    ADD	//  account _14
+    _set_balance INLINECALLDICT
+    0x40000000 PUSHINT	//  _16
+  }>
+  _burn PROC:<{
+    //  account amount
+    OVER	//  account amount account
+    REWRITESTDADDR	//  account amount _19 _20
+    NIP	//  account amount account_addr
+    0 EQINT	//  account amount _6
+    IFJMP:<{	//  account amount
+      2DROP	// 
+      0x50000001 PUSHINT	//  _7
+    }>	//  account amount
+    OVER	//  account amount account
+    _get_balance INLINECALLDICT	//  account amount account_balance
+    s0 s1 PUSH2	//  account amount account_balance account_balance amount
+    LESS	//  account amount account_balance _10
+    IFJMP:<{	//  account amount account_balance
+      3 BLKDROP	// 
+      0x50000002 PUSHINT	//  _11
+    }>	//  account amount account_balance
+    OVER	//  account amount account_balance amount
+    SUB	//  account amount _12
+    s1 s2 XCHG	//  amount account _12
+    _set_balance INLINECALLDICT
+    _get_total_supply INLINECALLDICT	//  amount total_supply
+    SWAP	//  total_supply amount
+    SUB	//  _16
+    _set_total_supply INLINECALLDICT
+    0x50000000 PUSHINT	//  _18
+  }>
+  recv_internal PROC:<{
+    //  msg_value in_msg_cell in_msg
+    s2 POP	//  in_msg in_msg_cell
+    CTOS	//  in_msg cs
+    4 LDU	//  in_msg flags cs
+    SWAP
+    1 PUSHINT	//  in_msg cs flags _9=1
+    AND	//  in_msg cs _10
+    IFJMP:<{	//  in_msg cs
+      2DROP	// 
+      0xaaaaaaaa PUSHINT	//  _11
+    }>	//  in_msg cs
+    OVER	//  in_msg cs in_msg
+    SEMPTY	//  in_msg cs _12
+    IFJMP:<{	//  in_msg cs
+      2DROP	// 
+      0xaaaaaaaa PUSHINT	//  _13
+    }>	//  in_msg cs
+    LDMSGADDR	//  in_msg _156 _155
+    DROP	//  in_msg msg_sender
+    SWAP	//  msg_sender in_msg
+    32 LDU	//  msg_sender _19 in_msg
+    64 LDU	//  msg_sender op query_id in_msg
+    0x20000000 PUSHINT	//  msg_sender op query_id in_msg _25
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _25
+    EQUAL	//  msg_sender op query_id in_msg _26
+    IFJMP:<{	//  msg_sender op query_id in_msg
+      2 1 BLKDROP2	//  msg_sender in_msg
+      LDMSGADDR	//  msg_sender _30 in_msg
+      256 LDU	//  msg_sender _30 _164 _163
+      DROP	//  msg_sender _30 _32
+      s2 PUSH
+      -ROT	//  msg_sender sender receiver amount
+      _transfer CALLDICT	//  msg_sender status_code
+      0 PUSHINT	//  msg_sender status_code _37=0
+      s2 s0 s0 XC2PU
+      s3 s(-1) PUXC
+      64 PUSHINT	//  status_code msg_sender _37=0 status_code _38=0 _39=64
+      send_message INLINECALLDICT
+    }>	//  msg_sender op query_id in_msg
+    0x20000004 PUSHINT	//  msg_sender op query_id in_msg _41
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _41
+    EQUAL	//  msg_sender op query_id in_msg _42
+    IFJMP:<{	//  msg_sender op query_id in_msg
+      2 1 BLKDROP2	//  msg_sender in_msg
+      256 LDU	//  msg_sender _166 _165
+      DROP	//  msg_sender _45
+      OVER	//  msg_sender amount sender
+      MYADDR	//  msg_sender amount sender _49
+      ROT	//  msg_sender sender _49 amount
+      _transfer CALLDICT	//  msg_sender status_code
+      0 PUSHINT	//  msg_sender status_code _51=0
+      s2 s0 s0 XC2PU
+      s3 s(-1) PUXC
+      64 PUSHINT	//  status_code msg_sender _51=0 status_code _52=0 _53=64
+      send_message INLINECALLDICT
+    }>	//  msg_sender op query_id in_msg
+    0x20000005 PUSHINT	//  msg_sender op query_id in_msg _55
+    s4 PUSH	//  msg_sender op query_id in_msg _55 msg_sender
+    only_owner INLINECALLDICT	//  msg_sender op query_id in_msg _55 _56
+    AND	//  msg_sender op query_id in_msg _57
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _57
+    EQUAL	//  msg_sender op query_id in_msg _58
+    IFJMP:<{	//  msg_sender op query_id in_msg
+      2 1 BLKDROP2	//  msg_sender in_msg
+      LDMSGADDR	//  msg_sender _62 in_msg
+      256 LDU	//  msg_sender _62 _170 _169
+      DROP	//  msg_sender receiver amount
+      MYADDR	//  msg_sender receiver amount _68
+      -ROT	//  msg_sender _68 receiver amount
+      _transfer CALLDICT	//  msg_sender status_code
+      0 PUSHINT	//  msg_sender status_code _70=0
+      s2 s0 s0 XC2PU
+      s3 s(-1) PUXC
+      64 PUSHINT	//  status_code msg_sender _70=0 status_code _71=0 _72=64
+      send_message INLINECALLDICT
+    }>	//  msg_sender op query_id in_msg
+    0x30000000 PUSHINT	//  msg_sender op query_id in_msg _74
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _74
+    EQUAL	//  msg_sender op query_id in_msg _75
+    IFJMP:<{	//  msg_sender op query_id in_msg
+      2 1 BLKDROP2	//  msg_sender in_msg
+      LDMSGADDR	//  msg_sender _80 in_msg
+      256 LDU	//  msg_sender _80 _82 in_msg
+      LDREF	//  msg_sender _80 _82 _176 _175
+      DROP	//  msg_sender _80 _82 _85
+      s3 PUSH	//  msg_sender receiver amount payload sender
+      3 -ROLL	//  msg_sender sender receiver amount payload
+      _transfer_call CALLDICT	//  msg_sender status_code
+      0x30000000 PUSHINT	//  msg_sender status_code _89
+      s1 s(-1) PUXC	//  msg_sender status_code status_code _89
+      NEQ	//  msg_sender status_code _90
+      IF:<{	//  msg_sender status_code
+        0 PUSHINT	//  msg_sender status_code _91=0
+        s2 s0 s0 XC2PU
+        s3 s(-1) PUXC
+        64 PUSHINT	//  status_code msg_sender _91=0 status_code _92=0 _93=64
+        send_message INLINECALLDICT
+      }>ELSE<{
+        NIP	//  status_code
+      }>
+    }>	//  msg_sender op query_id in_msg
+    0x10000000 PUSHINT	//  msg_sender op query_id in_msg _95
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _95
+    EQUAL	//  msg_sender op query_id in_msg _96
+    IFJMP:<{	//  msg_sender op query_id in_msg
+      1 2 BLKDROP2	//  msg_sender query_id in_msg
+      256 LDU	//  msg_sender query_id _178 _177
+      DROP	//  msg_sender query_id unused_amount
+      OVER	//  msg_sender query_id unused_amount query_id
+      _get_callback INLINECALLDICT	//  msg_sender query_id unused_amount _179 _180 _181
+      2DROP	//  msg_sender query_id unused_amount callback_sender
+      s3 s2 s(-1) PUXC2	//  msg_sender callback_sender msg_sender query_id unused_amount
+      _resolve_transfer CALLDICT	//  msg_sender callback_sender status_code
+      0x10000000 PUSHINT	//  msg_sender callback_sender status_code _107
+      s1 s(-1) PUXC	//  msg_sender callback_sender status_code status_code _107
+      EQUAL	//  msg_sender callback_sender status_code _108
+      IF:<{	//  msg_sender callback_sender status_code
+        1 2 BLKDROP2	//  msg_sender status_code
+      }>ELSE<{
+        NIP	//  msg_sender status_code
+      }>
+      0 PUSHINT	//  msg_sender status_code _109=0
+      s2 s0 s0 XC2PU
+      s3 s(-1) PUXC
+      64 PUSHINT	//  status_code msg_sender _109=0 status_code _110=0 _111=64
+      send_message INLINECALLDICT
+    }>	//  msg_sender op query_id in_msg
+    NIP	//  msg_sender op in_msg
+    0x40000000 PUSHINT	//  msg_sender op in_msg _113
+    s3 PUSH	//  msg_sender op in_msg _113 msg_sender
+    only_owner INLINECALLDICT	//  msg_sender op in_msg _113 _114
+    AND	//  msg_sender op in_msg _115
+    s2 s(-1) PUXC	//  msg_sender op in_msg op _115
+    EQUAL	//  msg_sender op in_msg _116
+    IFJMP:<{	//  msg_sender op in_msg
+      NIP	//  msg_sender in_msg
+      LDMSGADDR	//  msg_sender _119 in_msg
+      256 LDU	//  msg_sender _119 _185 _184
+      DROP	//  msg_sender account amount
+      _mint CALLDICT	//  msg_sender status_code
+      0 PUSHINT	//  msg_sender status_code _126=0
+      s2 s0 s0 XC2PU
+      s3 s(-1) PUXC
+      64 PUSHINT	//  status_code msg_sender _126=0 status_code _127=0 _128=64
+      send_message INLINECALLDICT
+    }>	//  msg_sender op in_msg
+    0x50000000 PUSHINT	//  msg_sender op in_msg _130
+    s3 PUSH	//  msg_sender op in_msg _130 msg_sender
+    only_owner INLINECALLDICT	//  msg_sender op in_msg _130 _131
+    AND	//  msg_sender op in_msg _132
+    s1 s2 XCHG	//  msg_sender in_msg op _132
+    EQUAL	//  msg_sender in_msg _133
+    IFJMP:<{	//  msg_sender in_msg
+      LDMSGADDR	//  msg_sender _136 in_msg
+      256 LDU	//  msg_sender _136 _189 _188
+      DROP	//  msg_sender account amount
+      _burn CALLDICT	//  msg_sender status_code
+      0 PUSHINT	//  msg_sender status_code _143=0
+      s2 s0 s0 XC2PU
+      s3 s(-1) PUXC
+      64 PUSHINT	//  status_code msg_sender _143=0 status_code _144=0 _145=64
+      send_message INLINECALLDICT
+    }>	//  msg_sender in_msg
+    DROP	//  msg_sender
+    0 PUSHINT	//  msg_sender _147=0
+    0xffffffff PUSHINT	//  msg_sender _147=0 _148
+    OVER	//  msg_sender _147=0 _148 _149=0
+    64 PUSHINT	//  msg_sender _147=0 _148 _149=0 _150=64
+    send_message INLINECALLDICT
+    0xffffffff PUSHINT	//  _152
+  }>
+  recv_external PROC:<{
+    //  in_msg
+    DROP	// 
+  }>
+  metadata PROC:<{
+    // 
+    _get_metadata INLINECALLDICT	//  _1 _2 _3 _4 _5
+  }>
+  total_supply PROC:<{
+    // 
+    _get_total_supply INLINECALLDICT	//  _0
+  }>
+  owner PROC:<{
+    // 
+    _get_owner INLINECALLDICT	//  _0
+  }>
+  balance_of PROC:<{
+    //  account
+    _get_balance INLINECALLDICT	//  _1
+  }>
+  allowance PROC:<{
+    //  owner spender
+    2DROP	// 
+    0 PUSHINT	//  _2=0
+  }>
+  callback PROC:<{
+    //  id
+    _get_callback INLINECALLDICT	//  sender receiver amount
+    s0 s2 XCHG	//  amount receiver sender
+    REWRITESTDADDR	//  amount receiver _14 _15
+    NIP	//  amount receiver sender_addr
+    SWAP	//  amount sender_addr receiver
+    REWRITESTDADDR	//  amount sender_addr _16 _17
+    NIP	//  amount sender_addr receiver_addr
+    ROT	//  sender_addr receiver_addr amount
+  }>
+}END>c

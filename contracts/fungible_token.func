@@ -1,0 +1,217 @@
+;; modificators
+int only_owner(slice msg_sender) inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  (_, int msg_sender_addr) = msg_sender.parse_std_addr();
+  if (msg_sender_addr == owner_addr) {
+    return -1;
+  }
+
+  return 0;
+}
+
+;; code
+int _transfer(slice sender, slice receiver, int amount) impure {
+  (_, int sender_addr) = sender.parse_std_addr();
+  if (sender_addr == 0) {
+    return op::transfer_from_zero_address();
+  }
+
+  (_, int receiver_addr) = receiver.parse_std_addr();
+  if (receiver_addr == 0) {
+    return op::transfer_to_zero_address();
+  }
+
+  int sender_balance = _get_balance(sender);
+  int receiver_balance = _get_balance(receiver);
+  if (sender_balance < amount) {
+    return op::transfer_amount_exceeds_balance();
+  }
+
+  int new_sender_balance = sender_balance - amount;
+  int new_receiver_balance = receiver_balance + amount;
+
+  if (new_sender_balance == 0) {
+    _del_balance(sender);
+  } else {
+    _set_balance(sender, new_sender_balance);
+  }
+
+  if (new_receiver_balance == 0) {
+    _del_balance(receiver);
+  } else {
+    _set_balance(receiver, new_receiver_balance);
+  }
+
+  return op::transfer();
+}
+
+int _transfer_call(slice sender, slice receiver, int amount, cell payload) impure {
+  int status_code = _transfer(sender, receiver, amount);
+  if (status_code == op::transfer()) {
+    int callback_id = _set_callback(sender, receiver, amount);
+    send_payload_message(receiver, 0, amount, op::on_transfer(), callback_id, payload, 64);
+    status_code = op::transfer_call();
+  }
+
+  return status_code;
+}
+
+int _resolve_transfer(slice msg_sender, int callback_id, int unused_amount) impure {
+  (slice sender, slice receiver, int amount) = _get_callback(callback_id);
+  (_, int msg_sender_addr) = msg_sender.parse_std_addr();
+  (_, int receiver_addr) = receiver.parse_std_addr();
+  if (msg_sender_addr != receiver_addr) {
+    return op::resolve_transfer_with_incorrect_callback();
+  }
+
+  if (unused_amount > 0) {
+    int receiver_balance = _get_balance(receiver);
+    if (unused_amount > receiver_balance) {
+      unused_amount = receiver_balance;
+    }
+
+    _transfer(receiver, sender, unused_amount);
+  }
+  _del_callback(callback_id);
+
+  return op::resolve_transfer();
+}
+
+int _mint(slice account, int amount) impure {
+  (_, int account_addr) = account.parse_std_addr();
+  if (account_addr == 0) {
+    return op::mint_to_zero_address();
+  }
+
+  int total_supply = _get_total_supply();
+  _set_total_supply(total_supply + amount);
+  int account_balance = _get_balance(account);
+  _set_balance(account, account_balance + amount);
+
+  return op::mint();
+}
+
+int _burn(slice account, int amount) impure {
+  (_, int account_addr) = account.parse_std_addr();
+  if (account_addr == 0) {
+    return op::burn_from_zero_address();
+  }
+
+  int account_balance = _get_balance(account);
+  if (account_balance < amount) {
+    return op::burn_amount_exceeds_balance();
+  }
+
+  _set_balance(account, account_balance - amount);
+  int total_supply = _get_total_supply();
+  _set_total_supply(total_supply - amount);
+
+  return op::burn();
+}
+
+int recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+  slice cs = in_msg_cell.begin_parse();
+
+  int flags = cs~load_uint(4);
+  if (flags & 1) {
+    return op::accept_payment();
+  }
+
+  if (in_msg.slice_empty?()) {
+    return op::accept_payment();
+  }
+
+  slice msg_sender = cs~load_msg_addr();
+  (int op, int query_id) = (in_msg~load_uint(32), in_msg~load_uint(64));
+
+  if (op == op::transfer()) {
+    (slice sender, slice receiver, int amount) = (msg_sender, in_msg~load_msg_addr(), in_msg~load_uint(256));
+    int status_code = _transfer(sender, receiver, amount);
+    send_message(msg_sender, 0, status_code, 0, 64);
+    return status_code;
+  }
+
+  if (op == op::transfer_to_cosmos()) {
+    (slice sender, int amount) = (msg_sender, in_msg~load_uint(256));
+    int status_code = _transfer(sender, my_address(), amount);
+    send_message(msg_sender, 0, status_code, 0, 64);
+    return status_code;
+  }
+
+  if (op == op::received_from_cosmos() & only_owner(msg_sender)) {
+    (slice sender, slice receiver, int amount) = (msg_sender, in_msg~load_msg_addr(), in_msg~load_uint(256));
+    int status_code = _transfer(my_address(), receiver, amount);
+    send_message(msg_sender, 0, status_code, 0, 64);
+    return status_code;
+  }
+
+  if (op == op::transfer_call()) {
+    (slice sender, slice receiver, int amount, cell payload) = (msg_sender, in_msg~load_msg_addr(), in_msg~load_uint(256), in_msg~load_ref());
+    int status_code = _transfer_call(sender, receiver, amount, payload);
+    if (status_code != op::transfer_call()) {
+      send_message(msg_sender, 0, status_code, 0, 64);
+    }
+    return status_code;
+  }
+
+  if (op == op::resolve_transfer()) {
+    int unused_amount = in_msg~load_uint(256);
+    (slice callback_sender, _, _) = _get_callback(query_id);
+    int status_code = _resolve_transfer(msg_sender, query_id, unused_amount);
+    if (status_code == op::resolve_transfer()) {
+      msg_sender = callback_sender; ;; send to caller
+    }
+    send_message(msg_sender, 0, status_code, 0, 64);
+    return status_code;
+  }
+
+  if (op == op::mint() & only_owner(msg_sender)) {
+    (slice account, int amount) = (in_msg~load_msg_addr(), in_msg~load_uint(256));
+    int status_code = _mint(account, amount);
+    send_message(msg_sender, 0, status_code, 0, 64);
+    return status_code;
+  }
+
+  if (op == op::burn() & only_owner(msg_sender)) {
+    (slice account, int amount) = (in_msg~load_msg_addr(), in_msg~load_uint(256));
+    int status_code = _burn(account, amount);
+    send_message(msg_sender, 0, status_code, 0, 64);
+    return status_code;
+  }
+
+  send_message(msg_sender, 0, op::failure(), 0, 64);
+  return op::failure();
+}
+
+() recv_external(slice in_msg) impure {
+}
+
+;; get methods
+(cell, cell, int, cell, cell) metadata() method_id {
+  return _get_metadata();
+}
+
+int total_supply() method_id {
+  return _get_total_supply();
+}
+
+int owner() method_id {
+  return _get_owner();
+}
+
+int balance_of(slice account) method_id {
+  return _get_balance(account);
+}
+
+int allowance(slice owner, slice spender) method_id {
+  return 0;
+}
+
+(int, int, int) callback(int id) method_id {
+  (slice sender, slice receiver, int amount) = _get_callback(id);
+  (_, int sender_addr) = sender.parse_std_addr();
+  (_, int receiver_addr) = receiver.parse_std_addr();
+
+  return (sender_addr, receiver_addr, amount);
+}

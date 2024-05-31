@@ -1,0 +1,166 @@
+;; storage
+() store_data(cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) impure {
+  set_data(
+    begin_cell()
+      .store_dict(balances)
+      .store_dict(callbacks)
+      .store_uint(total_supply, 256)
+      .store_uint(owner_addr, 256)
+      .store_ref(metadata)
+    .end_cell()
+  );
+}
+
+(cell, cell, int, int, cell) load_data(cell data) {
+  slice ds = data.begin_parse();
+
+  cell balances = ds~load_dict();
+  cell callbacks = ds~load_dict();
+  int total_supply = ds~load_uint(256);
+  int owner_addr = ds~load_uint(256);
+  cell metadata = ds~load_ref();
+
+  return (balances, callbacks, total_supply, owner_addr, metadata);
+}
+
+;; balance getters / setters
+int _get_balance(slice account) inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  int res = 0;
+  (_, int account_addr) = account.parse_std_addr();
+  (slice balance_slice, int balance_found) = balances.udict_get?(256, account_addr);
+  if (balance_found) {
+    res = balance_slice~load_uint(256);
+  }
+
+  return res;
+}
+
+() _set_balance(slice account, int amount) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  (_, int account_addr) = account.parse_std_addr();
+  balances~udict_set_builder(256, account_addr, begin_cell().store_uint(amount, 256));
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return ();
+}
+
+() _del_balance(slice account) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  (_, int account_addr) = account.parse_std_addr();
+  balances~udict_delete?(256, account_addr);
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return ();
+}
+
+;; callback getters / setters
+(slice, slice, int) _get_callback(int id) inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  slice sender = address(-1, 0);
+  slice receiver = address(-1, 0);
+  int amount = 0;
+
+  (slice callback_slice, int callback_found) = callbacks.udict_get?(64, id);
+  if (callback_found) {
+    sender = callback_slice~load_msg_addr();
+    receiver = callback_slice~load_msg_addr();
+    amount = callback_slice~load_uint(256);
+  }
+
+  return (sender, receiver, amount);
+}
+
+int _set_callback(slice sender, slice receiver, int amount) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  int id = 0;
+  (int last_id, slice value, int found) = callbacks.udict_get_max?(64);
+  if (found) {
+    id = last_id + 1;
+  }
+
+  callbacks~udict_set_builder(64, id,
+    begin_cell()
+      .store_slice(sender)
+      .store_slice(receiver)
+      .store_uint(amount, 256)
+  );
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return id;
+}
+
+() _del_callback(int id) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  callbacks~udict_delete?(64, id);
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return ();
+}
+
+;; total_supply getters / setters
+int _get_total_supply() inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  return total_supply;
+}
+
+() _set_total_supply(int amount) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  total_supply = amount;
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return ();
+}
+
+;; owner getters / setters
+int _get_owner() inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  return owner_addr;
+}
+
+() _set_owner(int addr) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  owner_addr = addr;
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return ();
+}
+
+;; metadata getters / setters
+(cell, cell, int, cell, cell) _get_metadata() inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  slice metadata_slice = metadata.begin_parse();
+  cell name = metadata_slice~load_ref();
+  cell symbol = metadata_slice~load_ref();
+  int decimals = metadata_slice~load_uint(8);
+  cell icon = metadata_slice~load_ref();
+  cell spec = metadata_slice~load_ref();
+
+  return (name, symbol, decimals, icon, spec);
+}
+
+() _set_metadata(cell name, cell symbol, int decimals, cell icon, cell spec) impure inline_ref {
+  (cell balances, cell callbacks, int total_supply, int owner_addr, cell metadata) = load_data(get_data());
+
+  cell metadata = begin_cell()
+    .store_ref(name)
+    .store_ref(symbol)
+    .store_uint(decimals, 8)
+    .store_ref(icon)
+    .store_ref(spec)
+  .end_cell();
+
+  store_data(balances, callbacks, total_supply, owner_addr, metadata);
+  return ();
+}
