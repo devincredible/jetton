@@ -15,8 +15,10 @@ const {
 
 async function test() {
   const { contract, addr_contract, keyPair } = await init();
+
   await transferToCosmos(contract, keyPair, {
-    amount: TonWeb.utils.toNano("5"),
+    receiver: "nuah1m0u823ml4z7acrt0wnugwwvdn67mha4xe0r7et",
+    amount: 1,
   });
   await log_balance(contract);
 }

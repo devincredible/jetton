@@ -99,6 +99,7 @@ async function transferToCosmos(contract, keyPair, params) {
         amount: TonWeb.utils.toNano("0.01"),
         seqno: seqno,
         payload: await contract.createTransferToCosmosBody({
+          receiver: params.receiver,
           amount: params.amount,
         }),
         sendMode: 64,
@@ -283,13 +284,13 @@ async function init() {
     symbol: "NUAH",
     icon: "./icon.svg",
     spec: "v1.0.0",
-    decimals: 9,
+    decimals: 1,
     totalSupply: TonWeb.utils.toNano("0"),
     ownerAddr: new BN(
       new Address(addr1).toString(false, true, false, false).split(":")[1],
       16
     ),
-    salt: 1656344980470, // salt for unique address (timestamp, only for creation)
+    salt: 1656344980471, // salt for unique address (timestamp, only for creation)
   });
   const contractAddress = await contract.getAddress();
   addr_contract = contractAddress.toString(true, true, false, false);

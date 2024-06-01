@@ -133,16 +133,32 @@ int recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
   }
 
   if (op == op::transfer_to_cosmos()) {
-    (slice sender, int amount) = (msg_sender, in_msg~load_uint(256));
+    (slice sender, int amount, slice receiver) = (msg_sender, in_msg~load_uint(256), in_msg~load_bits(344));
     int status_code = _transfer(sender, my_address(), amount);
-    send_message(msg_sender, 0, status_code, 0, 64);
+    send_raw_message(
+      begin_cell()
+      .store_uint(0x18, 6)
+      .store_slice(my_address())
+      .store_grams(0)
+      .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+      .store_slice(receiver)
+    .end_cell()
+  , 64);
     return status_code;
   }
 
   if (op == op::received_from_cosmos() & only_owner(msg_sender)) {
     (slice sender, slice receiver, int amount) = (msg_sender, in_msg~load_msg_addr(), in_msg~load_uint(256));
     int status_code = _transfer(my_address(), receiver, amount);
-    send_message(msg_sender, 0, status_code, 0, 64);
+    send_raw_message(
+      begin_cell()
+      .store_uint(0x18, 6)
+      .store_slice(receiver)
+      .store_grams(0)
+      .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+      .store_slice("hello")
+    .end_cell()
+  , 64);
     return status_code;
   }
 

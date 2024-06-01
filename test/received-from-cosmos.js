@@ -16,8 +16,8 @@ const {
 async function test() {
   const { contract, addr_contract, keyPair } = await init();
   await receivedFromCosmos(contract, keyPair, {
-    receiver: new Address(addr2),
-    amount: TonWeb.utils.toNano("10"),
+    receiver: new Address(addr1),
+    amount: 10,
   });
   await log_balance(contract);
 }

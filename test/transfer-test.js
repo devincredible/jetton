@@ -15,7 +15,7 @@ async function test() {
   const { contract, keyPair } = await init();
   await transfer(contract, keyPair, {
     receiver: new Address(addr2),
-    amount: TonWeb.utils.toNano("1"),
+    amount: 1,
   });
   await log_balance(contract);
 }
