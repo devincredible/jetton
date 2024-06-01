@@ -17,7 +17,7 @@ async function test() {
   const { contract, addr_contract, keyPair } = await init();
   await receivedFromCosmos(contract, keyPair, {
     receiver: new Address(addr1),
-    amount: 10,
+    amount: 1000,
   });
   await log_balance(contract);
 }

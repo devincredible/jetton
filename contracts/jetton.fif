@@ -491,7 +491,7 @@ PROGRAM{
       2DROP	// 
       0xaaaaaaaa PUSHINT	//  _13
     }>	//  in_msg cs
-    LDMSGADDR	//  in_msg _206 _205
+    LDMSGADDR	//  in_msg _205 _204
     DROP	//  in_msg msg_sender
     SWAP	//  msg_sender in_msg
     32 LDU	//  msg_sender _19 in_msg
@@ -502,7 +502,7 @@ PROGRAM{
     IFJMP:<{	//  msg_sender op query_id in_msg
       2 1 BLKDROP2	//  msg_sender in_msg
       LDMSGADDR	//  msg_sender _30 in_msg
-      256 LDU	//  msg_sender _30 _214 _213
+      256 LDU	//  msg_sender _30 _213 _212
       DROP	//  msg_sender _30 _32
       s2 PUSH
       -ROT	//  msg_sender sender receiver amount
@@ -520,150 +520,151 @@ PROGRAM{
       2 1 BLKDROP2	//  msg_sender in_msg
       256 LDU	//  msg_sender _46 in_msg
       344 PUSHINT	//  msg_sender _46 in_msg _50=344
-      LDSLICEX	//  msg_sender _46 _218 _217
+      LDSLICEX	//  msg_sender _46 _217 _216
       DROP	//  sender amount receiver
       MYADDR	//  sender amount receiver _53
-      s3 s0 s3 XCHG3	//  receiver sender _53 amount
-      _transfer CALLDICT	//  receiver status_code
-      0 PUSHINT	//  receiver status_code _55=0
-      24 PUSHINT	//  receiver status_code _55=0 _56=24
-      NEWC	//  receiver status_code _55=0 _56=24 _57
-      6 STU	//  receiver status_code _55=0 _59
-      MYADDR	//  receiver status_code _55=0 _59 _60
-      STSLICER	//  receiver status_code _55=0 _61
-      OVER	//  receiver status_code _55=0 _61 _62=0
-      STGRAMS	//  receiver status_code _55=0 _63
-      107 STU	//  receiver status_code _77
-      ROT	//  status_code _77 receiver
-      STSLICER	//  status_code _78
-      ENDC	//  status_code _79
-      64 PUSHINT	//  status_code _79 _80=64
+      s3 s0 s2 XC2PU	//  receiver amount sender _53 amount
+      _transfer CALLDICT	//  receiver amount status_code
+      0 PUSHINT	//  receiver amount status_code _55=0
+      24 PUSHINT	//  receiver amount status_code _55=0 _56=24
+      NEWC	//  receiver amount status_code _55=0 _56=24 _57
+      6 STU	//  receiver amount status_code _55=0 _59
+      MYADDR	//  receiver amount status_code _55=0 _59 _60
+      STSLICER	//  receiver amount status_code _55=0 _61
+      s0 s3 XCHG2	//  receiver _55=0 status_code _61 amount
+      STGRAMS	//  receiver _55=0 status_code _62
+      s1 s2 XCHG	//  receiver status_code _55=0 _62
+      107 STU	//  receiver status_code _76
+      ROT	//  status_code _76 receiver
+      STSLICER	//  status_code _77
+      ENDC	//  status_code _78
+      64 PUSHINT	//  status_code _78 _79=64
       SENDRAWMSG
     }>	//  msg_sender op query_id in_msg
-    0x20000005 PUSHINT	//  msg_sender op query_id in_msg _82
-    s4 PUSH	//  msg_sender op query_id in_msg _82 msg_sender
-    only_owner INLINECALLDICT	//  msg_sender op query_id in_msg _82 _83
-    AND	//  msg_sender op query_id in_msg _84
-    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _84
-    EQUAL	//  msg_sender op query_id in_msg _85
+    0x20000005 PUSHINT	//  msg_sender op query_id in_msg _81
+    s4 PUSH	//  msg_sender op query_id in_msg _81 msg_sender
+    only_owner INLINECALLDICT	//  msg_sender op query_id in_msg _81 _82
+    AND	//  msg_sender op query_id in_msg _83
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _83
+    EQUAL	//  msg_sender op query_id in_msg _84
     IFJMP:<{	//  msg_sender op query_id in_msg
       3 1 BLKDROP2	//  in_msg
-      LDMSGADDR	//  _89 in_msg
-      256 LDU	//  _89 _222 _221
+      LDMSGADDR	//  _88 in_msg
+      256 LDU	//  _88 _221 _220
       DROP	//  receiver amount
-      MYADDR	//  receiver amount _95
-      s2 s1 PUXC	//  receiver _95 receiver amount
+      MYADDR	//  receiver amount _94
+      s2 s1 PUXC	//  receiver _94 receiver amount
       _transfer CALLDICT	//  receiver status_code
-      0 PUSHINT	//  receiver status_code _97=0
-      24 PUSHINT	//  receiver status_code _97=0 _98=24
-      NEWC	//  receiver status_code _97=0 _98=24 _99
-      6 STU	//  receiver status_code _97=0 _101
-      s0 s3 XCHG2	//  _97=0 status_code _101 receiver
-      STSLICER	//  _97=0 status_code _102
-      s2 PUSH	//  _97=0 status_code _102 _103=0
-      STGRAMS	//  _97=0 status_code _104
-      s1 s2 XCHG	//  status_code _97=0 _104
-      107 STU	//  status_code _118
-      x{68656c6c6f} PUSHSLICE	//  status_code _118 _119
-      STSLICER	//  status_code _120
-      ENDC	//  status_code _121
-      64 PUSHINT	//  status_code _121 _122=64
+      0 PUSHINT	//  receiver status_code _96=0
+      24 PUSHINT	//  receiver status_code _96=0 _97=24
+      NEWC	//  receiver status_code _96=0 _97=24 _98
+      6 STU	//  receiver status_code _96=0 _100
+      s0 s3 XCHG2	//  _96=0 status_code _100 receiver
+      STSLICER	//  _96=0 status_code _101
+      s2 PUSH	//  _96=0 status_code _101 _102=0
+      STGRAMS	//  _96=0 status_code _103
+      s1 s2 XCHG	//  status_code _96=0 _103
+      107 STU	//  status_code _117
+      x{68656c6c6f} PUSHSLICE	//  status_code _117 _118
+      STSLICER	//  status_code _119
+      ENDC	//  status_code _120
+      64 PUSHINT	//  status_code _120 _121=64
       SENDRAWMSG
     }>	//  msg_sender op query_id in_msg
-    0x30000000 PUSHINT	//  msg_sender op query_id in_msg _124
-    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _124
-    EQUAL	//  msg_sender op query_id in_msg _125
+    0x30000000 PUSHINT	//  msg_sender op query_id in_msg _123
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _123
+    EQUAL	//  msg_sender op query_id in_msg _124
     IFJMP:<{	//  msg_sender op query_id in_msg
       2 1 BLKDROP2	//  msg_sender in_msg
-      LDMSGADDR	//  msg_sender _130 in_msg
-      256 LDU	//  msg_sender _130 _132 in_msg
-      LDREF	//  msg_sender _130 _132 _228 _227
-      DROP	//  msg_sender _130 _132 _135
+      LDMSGADDR	//  msg_sender _129 in_msg
+      256 LDU	//  msg_sender _129 _131 in_msg
+      LDREF	//  msg_sender _129 _131 _227 _226
+      DROP	//  msg_sender _129 _131 _134
       s3 PUSH	//  msg_sender receiver amount payload sender
       3 -ROLL	//  msg_sender sender receiver amount payload
       _transfer_call CALLDICT	//  msg_sender status_code
-      0x30000000 PUSHINT	//  msg_sender status_code _139
-      s1 s(-1) PUXC	//  msg_sender status_code status_code _139
-      NEQ	//  msg_sender status_code _140
+      0x30000000 PUSHINT	//  msg_sender status_code _138
+      s1 s(-1) PUXC	//  msg_sender status_code status_code _138
+      NEQ	//  msg_sender status_code _139
       IF:<{	//  msg_sender status_code
-        0 PUSHINT	//  msg_sender status_code _141=0
+        0 PUSHINT	//  msg_sender status_code _140=0
         s2 s0 s0 XC2PU
         s3 s(-1) PUXC
-        64 PUSHINT	//  status_code msg_sender _141=0 status_code _142=0 _143=64
+        64 PUSHINT	//  status_code msg_sender _140=0 status_code _141=0 _142=64
         send_message INLINECALLDICT
       }>ELSE<{
         NIP	//  status_code
       }>
     }>	//  msg_sender op query_id in_msg
-    0x10000000 PUSHINT	//  msg_sender op query_id in_msg _145
-    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _145
-    EQUAL	//  msg_sender op query_id in_msg _146
+    0x10000000 PUSHINT	//  msg_sender op query_id in_msg _144
+    s3 s(-1) PUXC	//  msg_sender op query_id in_msg op _144
+    EQUAL	//  msg_sender op query_id in_msg _145
     IFJMP:<{	//  msg_sender op query_id in_msg
       1 2 BLKDROP2	//  msg_sender query_id in_msg
-      256 LDU	//  msg_sender query_id _230 _229
+      256 LDU	//  msg_sender query_id _229 _228
       DROP	//  msg_sender query_id unused_amount
       OVER	//  msg_sender query_id unused_amount query_id
-      _get_callback INLINECALLDICT	//  msg_sender query_id unused_amount _231 _232 _233
+      _get_callback INLINECALLDICT	//  msg_sender query_id unused_amount _230 _231 _232
       2DROP	//  msg_sender query_id unused_amount callback_sender
       s3 s2 s(-1) PUXC2	//  msg_sender callback_sender msg_sender query_id unused_amount
       _resolve_transfer CALLDICT	//  msg_sender callback_sender status_code
-      0x10000000 PUSHINT	//  msg_sender callback_sender status_code _157
-      s1 s(-1) PUXC	//  msg_sender callback_sender status_code status_code _157
-      EQUAL	//  msg_sender callback_sender status_code _158
+      0x10000000 PUSHINT	//  msg_sender callback_sender status_code _156
+      s1 s(-1) PUXC	//  msg_sender callback_sender status_code status_code _156
+      EQUAL	//  msg_sender callback_sender status_code _157
       IF:<{	//  msg_sender callback_sender status_code
         1 2 BLKDROP2	//  msg_sender status_code
       }>ELSE<{
         NIP	//  msg_sender status_code
       }>
-      0 PUSHINT	//  msg_sender status_code _159=0
+      0 PUSHINT	//  msg_sender status_code _158=0
       s2 s0 s0 XC2PU
       s3 s(-1) PUXC
-      64 PUSHINT	//  status_code msg_sender _159=0 status_code _160=0 _161=64
+      64 PUSHINT	//  status_code msg_sender _158=0 status_code _159=0 _160=64
       send_message INLINECALLDICT
     }>	//  msg_sender op query_id in_msg
     NIP	//  msg_sender op in_msg
-    0x40000000 PUSHINT	//  msg_sender op in_msg _163
-    s3 PUSH	//  msg_sender op in_msg _163 msg_sender
-    only_owner INLINECALLDICT	//  msg_sender op in_msg _163 _164
-    AND	//  msg_sender op in_msg _165
-    s2 s(-1) PUXC	//  msg_sender op in_msg op _165
-    EQUAL	//  msg_sender op in_msg _166
+    0x40000000 PUSHINT	//  msg_sender op in_msg _162
+    s3 PUSH	//  msg_sender op in_msg _162 msg_sender
+    only_owner INLINECALLDICT	//  msg_sender op in_msg _162 _163
+    AND	//  msg_sender op in_msg _164
+    s2 s(-1) PUXC	//  msg_sender op in_msg op _164
+    EQUAL	//  msg_sender op in_msg _165
     IFJMP:<{	//  msg_sender op in_msg
       NIP	//  msg_sender in_msg
-      LDMSGADDR	//  msg_sender _169 in_msg
-      256 LDU	//  msg_sender _169 _237 _236
+      LDMSGADDR	//  msg_sender _168 in_msg
+      256 LDU	//  msg_sender _168 _236 _235
       DROP	//  msg_sender account amount
       _mint CALLDICT	//  msg_sender status_code
-      0 PUSHINT	//  msg_sender status_code _176=0
+      0 PUSHINT	//  msg_sender status_code _175=0
       s2 s0 s0 XC2PU
       s3 s(-1) PUXC
-      64 PUSHINT	//  status_code msg_sender _176=0 status_code _177=0 _178=64
+      64 PUSHINT	//  status_code msg_sender _175=0 status_code _176=0 _177=64
       send_message INLINECALLDICT
     }>	//  msg_sender op in_msg
-    0x50000000 PUSHINT	//  msg_sender op in_msg _180
-    s3 PUSH	//  msg_sender op in_msg _180 msg_sender
-    only_owner INLINECALLDICT	//  msg_sender op in_msg _180 _181
-    AND	//  msg_sender op in_msg _182
-    s1 s2 XCHG	//  msg_sender in_msg op _182
-    EQUAL	//  msg_sender in_msg _183
+    0x50000000 PUSHINT	//  msg_sender op in_msg _179
+    s3 PUSH	//  msg_sender op in_msg _179 msg_sender
+    only_owner INLINECALLDICT	//  msg_sender op in_msg _179 _180
+    AND	//  msg_sender op in_msg _181
+    s1 s2 XCHG	//  msg_sender in_msg op _181
+    EQUAL	//  msg_sender in_msg _182
     IFJMP:<{	//  msg_sender in_msg
-      LDMSGADDR	//  msg_sender _186 in_msg
-      256 LDU	//  msg_sender _186 _241 _240
+      LDMSGADDR	//  msg_sender _185 in_msg
+      256 LDU	//  msg_sender _185 _240 _239
       DROP	//  msg_sender account amount
       _burn CALLDICT	//  msg_sender status_code
-      0 PUSHINT	//  msg_sender status_code _193=0
+      0 PUSHINT	//  msg_sender status_code _192=0
       s2 s0 s0 XC2PU
       s3 s(-1) PUXC
-      64 PUSHINT	//  status_code msg_sender _193=0 status_code _194=0 _195=64
+      64 PUSHINT	//  status_code msg_sender _192=0 status_code _193=0 _194=64
       send_message INLINECALLDICT
     }>	//  msg_sender in_msg
     DROP	//  msg_sender
-    0 PUSHINT	//  msg_sender _197=0
-    0xffffffff PUSHINT	//  msg_sender _197=0 _198
-    OVER	//  msg_sender _197=0 _198 _199=0
-    64 PUSHINT	//  msg_sender _197=0 _198 _199=0 _200=64
+    0 PUSHINT	//  msg_sender _196=0
+    0xffffffff PUSHINT	//  msg_sender _196=0 _197
+    OVER	//  msg_sender _196=0 _197 _198=0
+    64 PUSHINT	//  msg_sender _196=0 _197 _198=0 _199=64
     send_message INLINECALLDICT
-    0xffffffff PUSHINT	//  _202
+    0xffffffff PUSHINT	//  _201
   }>
   recv_external PROC:<{
     //  in_msg

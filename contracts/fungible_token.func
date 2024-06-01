@@ -139,7 +139,7 @@ int recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
       begin_cell()
       .store_uint(0x18, 6)
       .store_slice(my_address())
-      .store_grams(0)
+      .store_grams(amount)
       .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
       .store_slice(receiver)
     .end_cell()

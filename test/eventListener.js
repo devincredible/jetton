@@ -17,6 +17,7 @@ async function getTransactionDetails() {
       if (txs[i].out_msgs.length > 0) {
         if (txs[i].out_msgs[0].source == txs[i].out_msgs[0].destination) {
           if (hashes.indexOf(txs[i].transaction_id.hash) == -1) {
+            console.log(txs[i].out_msgs[0].value - 2581600);
             console.log(atob(txs[i].out_msgs[0].message));
             hashes.push(txs[i].transaction_id.hash);
           }

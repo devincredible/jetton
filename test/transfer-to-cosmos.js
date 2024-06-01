@@ -18,7 +18,7 @@ async function test() {
 
   await transferToCosmos(contract, keyPair, {
     receiver: "nuah1m0u823ml4z7acrt0wnugwwvdn67mha4xe0r7et",
-    amount: 1,
+    amount: 50,
   });
   await log_balance(contract);
 }
